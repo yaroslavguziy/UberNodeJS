@@ -13,6 +13,6 @@ const router = new express.Router();
 router.use('/api/auth', authRouter);
 router.use('/api/users', authMiddleware, usersRouter);
 router.use('/api/trucks', [authMiddleware, driverMiddleware], trucksRouter);
-router.use('/api/loads', [authMiddleware, loadMiddleware], loadsRouter);
+router.use('/api/loads', loadsRouter);
 
 module.exports = router;

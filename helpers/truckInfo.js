@@ -25,6 +25,21 @@ const truckTypes = {
   },
 };
 
+const checkTruckLoad = (truck, load) => {
+  const truckType = truckTypes[truck.type];
+  console.log('truckType', truckType);
+  if (
+    truck &&
+    load.payload <= truckType.payload &&
+    load.dimensions.width <= truckType.dimensions.width &&
+    load.dimensions.length <= truckType.dimensions.length &&
+    load.dimensions.height <= truckType.dimensions.height
+  ) {
+    return true;
+  }
+  return false;
+};
+
 module.exports = {
-  truckTypes,
+  checkTruckLoad,
 };
