@@ -1,14 +1,13 @@
 const Router = require('express');
 const router = new Router();
 
-const driverMiddleware = require('../middleware/driverMiddleware');
-const trucksController = require('../controllers/trucksController');
+const TrucksController = require('../controllers/trucksController');
 
-router.get('', trucksController.getUsersTrucks);
-router.post('', trucksController.addTruck);
-router.get('/:id', trucksController.getUsersTruckById);
-router.put('/:id', trucksController.updateUsersTruckById);
-router.delete('/:id', trucksController.deleteUsersTruckById);
-router.post('/:id/assign', trucksController.assignTruck);
+router.get('', TrucksController.getUsersTrucks);
+router.post('', TrucksController.addTruck);
+router.get('/:id', TrucksController.getUsersTruckById);
+router.put('/:id', TrucksController.updateUsersTruckById);
+router.delete('/:id', TrucksController.deleteUsersTruckById);
+router.post('/:id/assign', TrucksController.assignTruck);
 
 module.exports = router;

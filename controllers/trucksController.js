@@ -3,7 +3,7 @@ const Mongoose = require('mongoose');
 const ObjectId = Mongoose.Types.ObjectId;
 const truckTypes = ['SPRINTER', 'SMALL STRAIGHT', 'LARGE STRAIGHT'];
 
-class trucksController {
+class TrucksController {
   async getUsersTrucks(req, res) {
     try {
       if (!req.user.id) {
@@ -143,4 +143,4 @@ class trucksController {
   }
 }
 
-module.exports = new trucksController();
+module.exports = new TrucksController();

@@ -1,14 +1,13 @@
 const Router = require('express');
 const router = new Router();
 
-const loadMiddleware = require('../middleware/loadMiddleware');
-const loadsController = require('../controllers/loadsController');
+const LoadsController = require('../controllers/loadsController');
 
-router.post('', loadsController.addLoad);
+router.post('', LoadsController.addLoad);
 // router.get('/loads/:id', getLoad);
 // router.put('/loads/:id', updateLoad);
-// router.post('/loads/:id/post', postLoad);
-router.get('', loadsController.getLoads);
+router.post('/:id/post', LoadsController.addLoadById);
+router.get('', LoadsController.getLoads);
 // router.delete('/loads/:id', deleteLoad);
 // router.get('/loads/:id/shipping_info', getLoadShippingInfo);
 

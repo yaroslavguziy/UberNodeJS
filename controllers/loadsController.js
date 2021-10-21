@@ -1,44 +1,104 @@
-const User = require('../models/userModel');
 const Truck = require('../models/truckModel');
 const Load = require('../models/loadModel');
-const { loadValidation } = require('../validation/load');
 
-const truckDimensions = [
-  { type: 'SPRINTER', dimensions: { length: 300, width: 250, height: 170 }, payload: 1700 },
-  { type: 'SMALL STRAIGHT', dimensions: { length: 500, width: 250, height: 170 }, payload: 2500 },
-  { type: 'LARGE STRAIGHT', dimensions: { length: 700, width: 350, height: 200 }, payload: 4000 },
-];
-
-class loadsController {
+class LoadsController {
   async addLoad(req, res) {
     try {
-      const { error } = loadValidation(req.body);
-      const { name, payload, pickup_address, delivery_address, dimensions } = req.body;
-      if (error) {
-        return res.status(400).json({ message: 'Invalid input data' });
-      } else {
-        const load = new Load({
-          created_by: req.user.id,
-          name: name,
-          payload: payload,
-          pickup_address: pickup_address,
-          delivery_address: delivery_address,
-          dimensions: dimensions,
-        });
-        await load.save();
-        res.status(200).json({ message: 'Load created successfully' });
+      const { id } = req.user;
+      const loadInfo = req.body;
+
+      if (!loadInfo) {
+        return res.status(400).json({ message: 'Add load body' });
       }
-    } catch (err) {
-      console.log(err);
-      res.status(500).json({ message: 'Server error' });
+
+      const newLoad = new Load({
+        ...loadInfo,
+        created_by: id,
+      });
+
+      await newLoad.save();
+
+      return res.status(200).json({ message: 'Load created successfully' });
+    } catch (e) {
+      res.status(400).json({ message: e.message });
     }
   }
 
   async getLoads(req, res) {
-    res.status(200).json({
-      data: [1, 2, 3],
-    });
+    try {
+      const limit = parseInt(req.query.limit || '0');
+      const offset = parseInt(req.query.offset || '0');
+
+      const loads = await Load.find({ userId: req.user.userId }).select('-__v').skip(offset).limit(limit);
+
+      return res.status(200).json({
+        loads: loads,
+      });
+    } catch (e) {
+      res.status(400).json({ message: e.message });
+    }
+  }
+
+  async addLoadById(req, res) {
+    try {
+      const id = req.params.id;
+      const load = await Load.findOne({ _id: id });
+      if (!load) {
+        return res.status(400).json({ message: 'No load found' });
+      }
+
+      await load.updateOne({
+        $set: {
+          status: 'POSTED',
+        },
+      });
+
+      const trucks = await Truck.find({
+        status: 'IS',
+        assigned_to: { $ne: null },
+      });
+
+      const truck = trucks?.find(truck => checkTruckLoad(truck, load));
+
+      if (!truck) {
+        await load.updateOne({
+          $set: {
+            status: 'NEW',
+          },
+        });
+        return res.status(400).json({ message: 'No truck found' });
+      }
+
+      await truck.updateOne({
+        $set: {
+          status: 'OL',
+        },
+      });
+
+      const driverId = truck.assigned_to;
+
+      await load.updateOne({
+        $set: {
+          status: 'ASSIGNED',
+          state: 'En route to Pick Up',
+          assigned_to: driverId,
+        },
+        $push: {
+          logs: {
+            message: `Load assigned to driver with id ${driverId}`,
+            time: new Date(Date.now()),
+          },
+        },
+      });
+
+      res.status(200).json({
+        message: 'Load posted successfully',
+        driver_found: true,
+      });
+    } catch (e) {
+      res.status(400).json({ message: e.message });
+    }
   }
 }
 
-module.exports = new loadsController();
+module.exports = new LoadsController();

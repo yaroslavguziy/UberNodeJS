@@ -10,7 +10,7 @@ const loadsRouter = require('./loadsRouter');
 
 const router = new express.Router();
 
-router.use('/api', authRouter);
+router.use('/api/auth', authRouter);
 router.use('/api/users', authMiddleware, usersRouter);
 router.use('/api/trucks', [authMiddleware, driverMiddleware], trucksRouter);
 router.use('/api/loads', [authMiddleware, loadMiddleware], loadsRouter);

@@ -13,11 +13,14 @@ const loadSchema = new Schema(
     },
     status: {
       type: String,
+      enum: ['NEW', 'POSTED', 'ASSIGNED', 'SHIPPED'],
       default: 'NEW',
+      required: true,
     },
     state: {
       type: String,
-      default: '',
+      enum: ['En route to Pick Up', 'Arrived to Pick Up', 'En route to delivery', 'Arrived to delivery'],
+      default: 'En route to Pick Up',
     },
     name: {
       type: String,
@@ -49,19 +52,15 @@ const loadSchema = new Schema(
         required: true,
       },
     },
-    logs: [
-      {
-        message: {
-          type: String,
-          default: '',
-        },
-        time: {
-          type: Date,
-          default: '',
-        },
-        _id: false,
+    logs: {
+      type: Array,
+      message: String,
+      time: Date,
+      default: {
+        message: 'Load assigned to driver',
+        time: new Date(Date.now()),
       },
-    ],
+    },
   },
   {
     timestamps: {

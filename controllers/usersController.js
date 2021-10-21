@@ -1,7 +1,7 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
 
-class usersController {
+class UsersController {
   async getProfileInfo(req, res) {
     try {
       const user = await User.findOne({
@@ -69,4 +69,4 @@ class usersController {
   }
 }
 
-module.exports = new usersController();
+module.exports = new UsersController();

@@ -1,19 +1,19 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { validationResult } = require('express-validator');
+const { authValidation } = require('../helpers/authValidation');
 const secret = process.env.SECRET;
 
-class authController {
+class AuthController {
   async registration(req, res) {
     try {
-      const errors = validationResult(req);
+      const { email, password, role } = req.body;
+      const { error } = authValidation.validate({ email, password, role });
 
-      if (!errors.isEmpty()) {
+      if (error) {
         return res.status(400).json({ message: 'Registration error' });
       }
 
-      const { email, password, role } = req.body;
       const newUser = await User.findOne({ email });
 
       if (newUser) {
@@ -52,6 +52,22 @@ class authController {
       res.status(500).json({ message: 'Internal server error' });
     }
   }
+
+  async forgotPassword(req, res) {
+    try {
+      const { email } = req.body;
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(400).json({ message: 'Invalid email' });
+      }
+
+      res.status(200).json({
+        message: 'New password sent to your email address',
+      });
+    } catch (e) {
+      res.status(400).json({ message: e.message });
+    }
+  }
 }
 
-module.exports = new authController();
+module.exports = new AuthController();

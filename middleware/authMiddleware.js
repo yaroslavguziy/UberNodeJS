@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const secret = process.env.SECRET;
 
-module.exports = function (req, res, next) {
+const authMiddleware = (req, res, next) => {
   if (req.method === 'OPTIONS') {
     next();
   }
@@ -21,3 +21,5 @@ module.exports = function (req, res, next) {
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+module.exports = authMiddleware;
